@@ -108,6 +108,7 @@
 - (void)swatchList:(MBColorSwatchList *)swatchList didSelectColorAtIndex:(NSInteger)index {
     UIColor *color = swatchList.colors[index];
     self.color = color;
+    [self sendActionsForControlEvents:UIControlEventValueChanged];
 }
 
 - (UIColor *)swatchList:(MBColorSwatchList *)swatchList colorToSetForSwatchAtIndex:(NSInteger)index {
