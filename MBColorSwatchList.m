@@ -129,7 +129,6 @@ static NSString * MBUDColorPickerSavedColors = @"MBColorPickerSavedColors";
 
 - (void)layoutSubviews {
     if (!_layers) {
-        NSLog(@"R : %d C : %d", _rows, _columns);
         CGFloat lineWidth = 1.0f;
         CGFloat distance = floorf((self.bounds.size.width-lineWidth) - (_columns * 40)) / (_columns - 1);
         NSMutableArray *array = [NSMutableArray arrayWithCapacity:_rows * _columns];

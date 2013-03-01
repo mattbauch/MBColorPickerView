@@ -10,9 +10,10 @@
 
 @interface MBBrightnessPicker : UIControl
 
-@property (assign, nonatomic) CGFloat brightness;
+@property (readonly, nonatomic) CGFloat brightness;
 
-- (void)setHue:(CGFloat)hue;
-- (void)setSaturation:(CGFloat)saturation;
+- (void)setHue:(CGFloat)hue animated:(BOOL)animated;
+- (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated;
+- (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated;
 
 @end

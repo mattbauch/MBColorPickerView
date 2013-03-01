@@ -23,4 +23,9 @@
 @property (assign, nonatomic) CGFloat brightness;
 @property (strong, nonatomic) UIColor *color;
 
+- (void)setHue:(CGFloat)hue animated:(BOOL)animated;
+- (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated;
+- (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated;
+- (void)setColor:(UIColor *)color animated:(BOOL)animated;
+
 @end

@@ -50,37 +50,54 @@
     _swatchList.backgroundColor = self.backgroundColor;
 }
 
-- (void)setColor:(UIColor *)color {
+- (void)setHue:(CGFloat)hue animated:(BOOL)animated {
+    _hue = hue;
+    [self.hsPicker setHue:hue animated:animated];
+    [self.brightnessPicker setHue:hue animated:animated];
+}
+
+- (void)setHue:(CGFloat)hue {
+    [self setHue:hue animated:NO];
+}
+
+- (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated {
+    _saturation = saturation;
+    [self.hsPicker setSaturation:saturation animated:animated];
+    [self.brightnessPicker setSaturation:saturation animated:animated];
+}
+
+- (void)setSaturation:(CGFloat)saturation {
+    [self setSaturation:saturation animated:NO];
+}
+
+- (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated {
+    _brightness = brightness;
+    [self.hsPicker setBrightness:brightness animated:animated];
+    [self.brightnessPicker setBrightness:brightness animated:animated];
+}
+
+- (void)setBrightness:(CGFloat)brightness {
+    [self setBrightness:brightness animated:NO];
+}
+
+- (void)setColor:(UIColor *)color animated:(BOOL)animated {
     CGFloat h,s,b,w;
     if ([color getHue:&h saturation:&s brightness:&b alpha:NULL]) {
-        self.hue = h;
-        self.saturation = s;
-        self.brightness = b;
+        [self setHue:h animated:animated];
+        [self setSaturation:s animated:animated];
+        [self setBrightness:b animated:animated];
     }
     else if ([color getWhite:&w alpha:NULL]) {
-        self.saturation = 0.0f;
-        self.brightness = w;
+        [self setSaturation:0 animated:animated];
+        [self setBrightness:w animated:animated];
     }
     _color = color;
 }
 
-- (void)setHue:(CGFloat)hue {
-    _hue = hue;
-    self.hsPicker.hue = hue;
-    [self.brightnessPicker setHue:hue];
+- (void)setColor:(UIColor *)color {
+    [self setColor:color animated:NO];
 }
 
-- (void)setSaturation:(CGFloat)saturation {
-    _saturation = saturation;
-    self.hsPicker.saturation = saturation;
-    [self.brightnessPicker setSaturation:saturation];
-}
-
-- (void)setBrightness:(CGFloat)brightness {
-    _brightness = brightness;
-    [self.hsPicker setBrightness:brightness];
-    self.brightnessPicker.brightness = brightness;
-}
 
 - (void)changeColorAndSendValueChangedAction {
     _color = [UIColor colorWithHue:_hsPicker.hue saturation:_hsPicker.saturation brightness:_brightnessPicker.brightness alpha:1];
@@ -88,8 +105,8 @@
 }
 
 - (IBAction)hsPickerDidChangeValue:(MBHueSaturationPicker *)sender {
-    [_brightnessPicker setHue:sender.hue];
-    [_brightnessPicker setSaturation:sender.saturation];
+    [_brightnessPicker setHue:sender.hue animated:NO];
+    [_brightnessPicker setSaturation:sender.saturation animated:NO];
 
     _hue = sender.hue;
     _saturation = sender.saturation;
@@ -97,7 +114,7 @@
 }
 
 - (IBAction)brightnessPickerDidChangeValue:(MBBrightnessPicker *)sender {
-    [_hsPicker setBrightness:sender.brightness];
+    [_hsPicker setBrightness:sender.brightness animated:NO];
     
     _brightness = sender.brightness;
     [self changeColorAndSendValueChangedAction];
@@ -107,7 +124,7 @@
 
 - (void)swatchList:(MBColorSwatchList *)swatchList didSelectColorAtIndex:(NSInteger)index {
     UIColor *color = swatchList.colors[index];
-    self.color = color;
+    [self setColor:color animated:YES];
     [self sendActionsForControlEvents:UIControlEventValueChanged];
 }
 

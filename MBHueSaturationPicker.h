@@ -13,8 +13,11 @@
 @interface MBHueSaturationPicker : UIControl
 @property (readonly, nonatomic) CAShapeLayer *crossHairLayer;
 
-@property (assign, nonatomic) CGFloat hue;
-@property (assign, nonatomic) CGFloat saturation;
+@property (readonly, nonatomic) CGFloat hue;
+@property (readonly, nonatomic) CGFloat saturation;
 
-- (void)setBrightness:(CGFloat)brightness;
+- (void)setHue:(CGFloat)hue animated:(BOOL)animated;
+- (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated;
+- (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated;
+
 @end

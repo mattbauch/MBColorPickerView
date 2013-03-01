@@ -59,27 +59,29 @@
     return self;
 }
 
-- (void)setHue:(CGFloat)hue {
+- (void)setHue:(CGFloat)hue animated:(BOOL)animated {
     _hue = hue;
-    [self configureCrossHairLayer];
+    [self configureCrossHairLayerAnimated:animated];
     [self setNeedsDisplay];
 }
 
-- (void)setSaturation:(CGFloat)saturation {
+- (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated {
     _saturation = saturation;
-    [self configureCrossHairLayer];
+    [self configureCrossHairLayerAnimated:animated];
     [self setNeedsDisplay];
 }
 
-- (void)setBrightness:(CGFloat)brightness {
+- (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated {
     _brightness = brightness;
-    [self configureCrossHairLayer];
+    [self configureCrossHairLayerAnimated:animated];
     [self setNeedsDisplay];
 }
 
-- (void)configureCrossHairLayer {
+- (void)configureCrossHairLayerAnimated:(BOOL)animated {
     [CATransaction begin];
-    [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
+    if (!animated) {
+        [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
+    }
     CGFloat y = (1-_brightness) * self.bounds.size.height;
     CGPoint point = CGPointMake(0, y);
     
@@ -89,7 +91,6 @@
     fillLayer.backgroundColor = [UIColor colorWithHue:_hue saturation:_saturation brightness:_brightness alpha:1].CGColor;
     
     [CATransaction commit];
-    
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -107,7 +108,7 @@
     CGFloat brightness = 1 - (y / self.bounds.size.height);
     if (brightness >= 0 && brightness <= 1) {
         _brightness = brightness;
-        [self configureCrossHairLayer];
+        [self configureCrossHairLayerAnimated:NO];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
 }

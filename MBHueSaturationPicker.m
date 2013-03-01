@@ -45,27 +45,29 @@
     return self;
 }
 
-- (void)setHue:(CGFloat)hue {
+- (void)setHue:(CGFloat)hue animated:(BOOL)animated {
     _hue = hue;
-    [self configureCrossHairLayer];
+    [self configureCrossHairLayerAnimated:animated];
 }
 
-- (void)setSaturation:(CGFloat)saturation {
+- (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated {
     _saturation = saturation;
-    [self configureCrossHairLayer];
+    [self configureCrossHairLayerAnimated:animated];
 }
 
-- (void)setBrightness:(CGFloat)brightness {
+- (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated {
     _brightness = brightness;
-    [self configureCrossHairLayer];
+    [self configureCrossHairLayerAnimated:animated];
 }
 
-- (void)configureCrossHairLayer {
+- (void)configureCrossHairLayerAnimated:(BOOL)animated {
     CGPoint center = CGPointMake(floorf(self.bounds.size.width/2.0f), floorf(self.bounds.size.height/2.0f));
     CGFloat radius = floorf(self.bounds.size.width/2.0f);
     
     [CATransaction begin];
-    [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
+    if (!animated) {
+        [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
+    }
     
     CGFloat angle = 2*M_PI * (1-_hue);
     CGFloat saturationRadius = radius * _saturation;
@@ -73,8 +75,8 @@
     
     _crossHairLayer.position = CGPointMake(point.x, point.y);
     _crossHairLayer.fillColor = [UIColor colorWithHue:_hue saturation:_saturation brightness:_brightness alpha:1].CGColor;
+    
     [CATransaction commit];
-
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
@@ -109,7 +111,7 @@
     }
     _hue = angleDeg / 360.0f;
 
-    [self configureCrossHairLayer];
+    [self configureCrossHairLayerAnimated:NO];
 
     [self sendActionsForControlEvents:UIControlEventValueChanged];
 }
