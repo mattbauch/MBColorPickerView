@@ -1,5 +1,5 @@
 //
-//  MBColorPickerView.h
+//  MBBrightnessPicker.h
 //
 //  Copyright (c) 2013 Matthias Bauch <dev@matthiasbauch.com>
 //  This work is free. You can redistribute it and/or modify it under the
@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface MBColorPickerView : UIView
+@interface MBBrightnessPicker : UIControl
+
+@property (readonly, nonatomic) CGFloat brightness;
+
+- (void)setHue:(CGFloat)hue animated:(BOOL)animated;
+- (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated;
+- (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated;
 
 @end
