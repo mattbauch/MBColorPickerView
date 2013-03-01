@@ -5,7 +5,7 @@ MBColorPickerView which can be used to select a UIColor. It works in HSV Mode. I
 
 
 
-![Screenshot](data.matthiasbauch.com/github/images/MBColorPicker/Screenshot_1.png "Screenshot 1")
+![Screenshot](http://data.matthiasbauch.com/github/images/MBColorPicker/Screenshot_1.png "Screenshot 1")
 
 
 How To
@@ -23,6 +23,7 @@ Version History
 TODO
 ====
 
+- improve looks
 - configuration with a bitmask (i.e. HSPicker|BrightnessPicker|SwatchView)
 - resizing for multiline swatch panels
 - allow to hide the swatch panel
