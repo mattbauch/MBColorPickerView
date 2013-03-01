@@ -119,8 +119,13 @@
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     CGPoint center = CGPointMake(floorf(self.bounds.size.width/2.0f), floorf(self.bounds.size.height/2.0f));
-    CGFloat radius = floorf(self.bounds.size.width/2.0f);
+    CGFloat radius = floorf(self.bounds.size.width/2.0f) + 5;           // draw a bit outside of our bouds. we will clip that back to our bounds.
+                                                                        // this avoids artifacts at the edge
     CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
+    
+    CGContextSaveGState(context);
+    CGContextAddEllipseInRect(context, self.bounds);
+    CGContextClip(context);
     
     NSInteger numberOfSegments = 3600;
     for (CGFloat i = 0; i < numberOfSegments; i++) {
@@ -151,8 +156,8 @@
         
         CGContextRestoreGState(context);
     }
-//    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
-//    CGContextFillEllipseInRect(context, CGRectMake(center.x-1, center.y-1, 3, 3));
+    
+    CGContextRestoreGState(context);
     
     CGContextSetStrokeColorWithColor(context, self.backgroundColor.CGColor);
     CGContextSetLineWidth(context, 1);
