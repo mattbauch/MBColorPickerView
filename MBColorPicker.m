@@ -103,16 +103,10 @@
     [self changeColorAndSendValueChangedAction];
 }
 
-- (IBAction)swatchListDidChangeValue:(MBColorSwatchList *)sender {
-    NSLog(@"Foo");
-}
-
-
 #pragma mark - MBSwatchListDelegate
 
 - (void)swatchList:(MBColorSwatchList *)swatchList didSelectColorAtIndex:(NSInteger)index {
     UIColor *color = swatchList.colors[index];
-    NSLog(@"COlor %@", color);
     self.color = color;
 }
 
