@@ -1,4 +1,4 @@
-MBColorPickerViewDemo
+MBColorPickerView
 =================
 
 MBColorPickerView which can be used to select a UIColor
