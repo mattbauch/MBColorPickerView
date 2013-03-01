@@ -12,6 +12,7 @@
 @interface MBBrightnessPicker ()
 @property (strong, nonatomic) CAShapeLayer *crossHairLayer;
 @property (strong, nonatomic) CAShapeLayer *borderLayer;
+@property (strong, nonatomic) CAGradientLayer *gradientLayer;
 @end
 
 @implementation MBBrightnessPicker {
@@ -25,6 +26,11 @@
         CGFloat lineWidth = 1.f;
         
         CGFloat borderInset = 0;
+        
+        _gradientLayer = [CAGradientLayer layer];
+        _gradientLayer.frame = self.bounds;
+        _gradientLayer.colors = @[(__bridge id)[UIColor whiteColor].CGColor, (__bridge id)[UIColor blackColor].CGColor];
+        [self.layer addSublayer:_gradientLayer];
         
         _borderLayer = [CAShapeLayer layer];
         _borderLayer.frame = CGRectInset(self.bounds, borderInset, borderInset);
@@ -61,23 +67,23 @@
 
 - (void)setHue:(CGFloat)hue animated:(BOOL)animated {
     _hue = hue;
-    [self configureCrossHairLayerAnimated:animated];
+    [self configureLayers:animated];
     [self setNeedsDisplay];
 }
 
 - (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated {
     _saturation = saturation;
-    [self configureCrossHairLayerAnimated:animated];
+    [self configureLayers:animated];
     [self setNeedsDisplay];
 }
 
 - (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated {
     _brightness = brightness;
-    [self configureCrossHairLayerAnimated:animated];
+    [self configureLayers:animated];
     [self setNeedsDisplay];
 }
 
-- (void)configureCrossHairLayerAnimated:(BOOL)animated {
+- (void)configureLayers:(BOOL)animated {
     [CATransaction begin];
     if (!animated) {
         [CATransaction setValue: (id) kCFBooleanTrue forKey: kCATransactionDisableActions];
@@ -89,6 +95,9 @@
     
     CALayer *fillLayer = _crossHairLayer.sublayers[0];
     fillLayer.backgroundColor = [UIColor colorWithHue:_hue saturation:_saturation brightness:_brightness alpha:1].CGColor;
+    
+    UIColor *color = [UIColor colorWithHue:_hue saturation:_saturation brightness:1 alpha:1];
+    _gradientLayer.colors = @[(__bridge id)color.CGColor, (__bridge id)[UIColor blackColor].CGColor];
     
     [CATransaction commit];
 }
@@ -108,30 +117,9 @@
     CGFloat brightness = 1 - (y / self.bounds.size.height);
     if (brightness >= 0 && brightness <= 1) {
         _brightness = brightness;
-        [self configureCrossHairLayerAnimated:NO];
+        [self configureLayers:NO];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
     }
-}
-
-- (void)drawRect:(CGRect)rect {
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
-    
-    UIColor *color = [UIColor colorWithHue:_hue saturation:_saturation brightness:1 alpha:1];
-
-    CGPoint start = CGPointMake(0, 0);
-    CGPoint end = CGPointMake(CGRectGetMaxX(self.bounds), CGRectGetMaxY(self.bounds));
-
-    CGPathRef path = CGPathCreateWithRect(CGRectMake(start.x, start.y, end.x - start.x, end.y - start.y), 0);
-    CGContextSaveGState(context);
-    CGContextAddPath(context, path);
-    CGContextClip(context);
-
-    NSArray *colors = @[(__bridge id)color.CGColor, (__bridge id)[UIColor blackColor].CGColor];
-    CGGradientRef gradient = CGGradientCreateWithColors(rgbColorSpace, (__bridge CFArrayRef)colors, NULL);
-    CGContextDrawLinearGradient(context, gradient, start, end, kCGGradientDrawsBeforeStartLocation|kCGGradientDrawsAfterEndLocation);
-
-    CGContextRestoreGState(context);
 }
 
 @end
