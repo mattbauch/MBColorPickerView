@@ -22,7 +22,7 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
-        CGFloat lineWidth = 1.f;
+        CGFloat lineWidth = 2.f;
         
         _borderLayer = [CAShapeLayer layer];
         _borderLayer.frame = self.bounds;
@@ -30,6 +30,7 @@
         _borderLayer.lineWidth = lineWidth;
         _borderLayer.strokeColor = [UIColor whiteColor].CGColor;
         _borderLayer.fillColor = [UIColor clearColor].CGColor;
+        _borderLayer.contentsScale = [UIScreen mainScreen].scale;
         [self.layer addSublayer:_borderLayer];
         
         CGFloat crossHairSize = 10;
@@ -116,17 +117,36 @@
     [self sendActionsForControlEvents:UIControlEventValueChanged];
 }
 
-- (void)drawRect:(CGRect)rect
-{
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    
-    CGPoint center = CGPointMake(floorf(self.bounds.size.width/2.0f), floorf(self.bounds.size.height/2.0f));
-    CGFloat radius = floorf(self.bounds.size.width/2.0f) + 5;           // draw a bit outside of our bouds. we will clip that back to our bounds.
-                                                                        // this avoids artifacts at the edge
+- (NSString *)pathForSize:(CGSize)size {
+    CGFloat scale = [UIScreen mainScreen].scale;
+    NSString *cacheDirectory = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *filename = [NSString stringWithFormat:@"MBColorPickerImage-%d-%d__@%dx.png", (int)size.width, (int)size.height, (int)scale];
+    return [cacheDirectory stringByAppendingPathComponent:filename];
+}
+
+- (void)saveBackgroundImageForSize:(CGSize)size {
+    if ([[[NSFileManager alloc] init] fileExistsAtPath:[self pathForSize:size]]) {
+        return;
+    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
+        CGContextRef context = UIGraphicsGetCurrentContext();
+        [self drawBackgroundInContext:context withSize:size];
+        UIImage *backgroundImage = UIGraphicsGetImageFromCurrentImageContext();
+        NSData *pngImage = UIImagePNGRepresentation(backgroundImage);
+        [pngImage writeToFile:[self pathForSize:size] atomically:YES];
+        UIGraphicsEndImageContext();
+    });
+}
+
+- (void)drawBackgroundInContext:(CGContextRef)context withSize:(CGSize)size {
+    CGPoint center = CGPointMake(floorf(size.width/2.0f), floorf(size.height/2.0f));
+    CGFloat radius = floorf(size.width/2.0f) + 5;           // draw a bit outside of our bouds. we will clip that back to our bounds.
+    // this avoids artifacts at the edge
     CGColorSpaceRef rgbColorSpace = CGColorSpaceCreateDeviceRGB();
     
     CGContextSaveGState(context);
-    CGContextAddEllipseInRect(context, self.bounds);
+    CGContextAddEllipseInRect(context, CGRectMake(0, 0, size.width, size.height));
     CGContextClip(context);
     
     NSInteger numberOfSegments = 3600;
@@ -163,7 +183,20 @@
     
     CGContextSetStrokeColorWithColor(context, self.backgroundColor.CGColor);
     CGContextSetLineWidth(context, 1);
-    CGContextStrokeEllipseInRect(context, CGRectMake(center.x - radius, center.y - radius, radius * 2, radius * 2));
+    CGContextStrokeEllipseInRect(context, CGRectMake(0, 0, size.width, size.height));
+}
+
+- (void)drawRect:(CGRect)rect
+{
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
+    UIImage *image = [UIImage imageWithContentsOfFile:[self pathForSize:self.bounds.size]];
+    if (image) {
+        [image drawInRect:self.bounds];
+    }
+    else {
+        [self drawBackgroundInContext:context withSize:self.bounds.size];
+    }
 }
 
 @end
