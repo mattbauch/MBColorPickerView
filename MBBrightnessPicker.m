@@ -25,44 +25,56 @@
     if (self) {
         CGFloat lineWidth = 2.f;
         
-        CGFloat borderInset = 0;
+        
         
         _gradientLayer = [CAGradientLayer layer];
-        _gradientLayer.frame = self.bounds;
-        _gradientLayer.colors = @[(__bridge id)[UIColor whiteColor].CGColor, (__bridge id)[UIColor blackColor].CGColor];
         [self.layer addSublayer:_gradientLayer];
         
         _borderLayer = [CAShapeLayer layer];
-        _borderLayer.frame = CGRectInset(self.bounds, borderInset, borderInset);
-        _borderLayer.path = CGPathCreateWithRect(CGRectMake(0, 0, self.bounds.size.width-(2*borderInset), self.bounds.size.height-(2*borderInset)), 0);
         _borderLayer.lineWidth = lineWidth;
         _borderLayer.strokeColor = [UIColor whiteColor].CGColor;
         _borderLayer.fillColor = [UIColor clearColor].CGColor;
         [self.layer addSublayer:_borderLayer];
         
-        CGFloat crossHairSize = 6;
-        _crossHairLayer = [CAShapeLayer layer];
-        _crossHairLayer.frame = CGRectMake(0, 0, frame.size.width, crossHairSize);
         
-        CGMutablePathRef path = CGPathCreateMutable();
-        CGPathMoveToPoint(path, 0, 0, 0);
-        CGPathAddLineToPoint(path, 0, frame.size.width, 0);
-        CGPathMoveToPoint(path, 0, 0, crossHairSize);
-        CGPathAddLineToPoint(path, 0, frame.size.width, crossHairSize);
-        _crossHairLayer.path = path;
-
+        _crossHairLayer = [CAShapeLayer layer];
         _crossHairLayer.strokeColor = [UIColor whiteColor].CGColor;
         _crossHairLayer.lineWidth = lineWidth;
         _crossHairLayer.fillColor = [UIColor clearColor].CGColor;
         _crossHairLayer.backgroundColor = [UIColor clearColor].CGColor;
         [self.layer addSublayer:_crossHairLayer];
         
-        CALayer *fillLayer = [CALayer layer];
-        fillLayer.frame = CGRectMake(0, 1, frame.size.width, crossHairSize-2);
-        fillLayer.backgroundColor = [UIColor blackColor].CGColor;
-        [_crossHairLayer addSublayer:fillLayer];
     }
     return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    CGFloat borderInset = 0;
+    
+    _gradientLayer.frame = self.bounds;
+    _gradientLayer.colors = @[(__bridge id)[UIColor whiteColor].CGColor, (__bridge id)[UIColor blackColor].CGColor];
+
+    _borderLayer.frame = CGRectInset(self.bounds, borderInset, borderInset);
+    _borderLayer.path = CGPathCreateWithRect(CGRectMake(0, 0, self.bounds.size.width-(2*borderInset), self.bounds.size.height-(2*borderInset)), 0);
+
+    CGFloat crossHairSize = 6;
+    CGMutablePathRef path = CGPathCreateMutable();
+    CGPathMoveToPoint(path, 0, 0, 0);
+    CGPathAddLineToPoint(path, 0, self.bounds.size.width, 0);
+    CGPathMoveToPoint(path, 0, 0, crossHairSize);
+    CGPathAddLineToPoint(path, 0, self.bounds.size.width, crossHairSize);
+    _crossHairLayer.path = path;
+
+    _crossHairLayer.frame = CGRectMake(0, 0, self.bounds.size.width, crossHairSize);
+
+    [_crossHairLayer.sublayers[0] removeFromSuperlayer];
+    CALayer *fillLayer = [CALayer layer];
+    fillLayer.frame = CGRectMake(0, 1, self.bounds.size.width, crossHairSize-2);
+    fillLayer.backgroundColor = [UIColor blackColor].CGColor;
+    [_crossHairLayer addSublayer:fillLayer];
+    
+    [self configureLayers:NO];
 }
 
 - (void)setHue:(CGFloat)hue animated:(BOOL)animated {

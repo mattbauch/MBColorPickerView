@@ -25,18 +25,13 @@
         CGFloat lineWidth = 2.f;
         
         _borderLayer = [CAShapeLayer layer];
-        _borderLayer.frame = self.bounds;
-        _borderLayer.path = CGPathCreateWithEllipseInRect(self.bounds, 0);
         _borderLayer.lineWidth = lineWidth;
         _borderLayer.strokeColor = [UIColor whiteColor].CGColor;
         _borderLayer.fillColor = [UIColor clearColor].CGColor;
         _borderLayer.contentsScale = [UIScreen mainScreen].scale;
         [self.layer addSublayer:_borderLayer];
         
-        CGFloat crossHairSize = 10;
         _crossHairLayer = [CAShapeLayer layer];
-        _crossHairLayer.frame = CGRectMake(40, 40, crossHairSize, crossHairSize);
-        _crossHairLayer.path = CGPathCreateWithEllipseInRect(CGRectMake(0, 0, crossHairSize, crossHairSize), 0);
         _crossHairLayer.strokeColor = [UIColor whiteColor].CGColor;
         _crossHairLayer.lineWidth = lineWidth;
         _crossHairLayer.fillColor = [UIColor clearColor].CGColor;
@@ -44,6 +39,18 @@
         [self.layer addSublayer:_crossHairLayer];
     }
     return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+    _borderLayer.frame = self.bounds;
+    _borderLayer.path = CGPathCreateWithEllipseInRect(self.bounds, 0);
+
+    CGFloat crossHairSize = 10;
+    _crossHairLayer.frame = CGRectMake(40, 40, crossHairSize, crossHairSize);
+    _crossHairLayer.path = CGPathCreateWithEllipseInRect(CGRectMake(0, 0, crossHairSize, crossHairSize), 0);
+    
+    [self configureCrossHairLayerAnimated:NO];
 }
 
 - (void)setHue:(CGFloat)hue animated:(BOOL)animated {
@@ -126,9 +133,11 @@
 
 - (void)saveBackgroundImageForSize:(CGSize)size {
     if ([[[NSFileManager alloc] init] fileExistsAtPath:[self pathForSize:size]]) {
+        NSLog(@"No Need to render image again");
         return;
     }
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSLog(@"Save background image for size %@", NSStringFromCGSize(size));
         UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
         CGContextRef context = UIGraphicsGetCurrentContext();
         [self drawBackgroundInContext:context withSize:size];
@@ -136,6 +145,8 @@
         NSData *pngImage = UIImagePNGRepresentation(backgroundImage);
         [pngImage writeToFile:[self pathForSize:size] atomically:YES];
         UIGraphicsEndImageContext();
+        NSLog(@"Done");
+        
     });
 }
 
@@ -192,9 +203,11 @@
 
     UIImage *image = [UIImage imageWithContentsOfFile:[self pathForSize:self.bounds.size]];
     if (image) {
+        NSLog(@"Use Image %@", [self pathForSize:self.bounds.size]);
         [image drawInRect:self.bounds];
     }
     else {
+        NSLog(@"No Image %@", [self pathForSize:self.bounds.size]);
         [self drawBackgroundInContext:context withSize:self.bounds.size];
     }
 }

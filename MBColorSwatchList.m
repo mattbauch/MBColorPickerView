@@ -23,9 +23,6 @@ static NSString * MBUDColorPickerSavedColors = @"MBColorPickerSavedColors";
 {
     self = [super initWithFrame:frame];
     if (self) {
-        _columns = frame.size.width/45;
-        _rows = 1;
-        
         NSData *data = [[NSUserDefaults standardUserDefaults] objectForKey:MBUDColorPickerSavedColors];
         if (data) {
             NSArray *colors = [NSKeyedUnarchiver unarchiveObjectWithData:data];
@@ -40,7 +37,6 @@ static NSString * MBUDColorPickerSavedColors = @"MBColorPickerSavedColors";
         
         _longPressGestureRecognizer = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressGesture:)];
         [self addGestureRecognizer:_longPressGestureRecognizer];
-        
     }
     return self;
 }
@@ -128,14 +124,28 @@ static NSString * MBUDColorPickerSavedColors = @"MBColorPickerSavedColors";
 }
 
 - (void)layoutSubviews {
+    if (_columns <= 0) {
+        _columns = floorf(self.bounds.size.width/44.0f);
+    }
+    if (_rows <= 0) {
+        _rows = floorf(self.bounds.size.height/44.0f);
+    }
+
     if (!_layers) {
         CGFloat lineWidth = 2.0f;
-        CGFloat distance = floorf((self.bounds.size.width-lineWidth) - (_columns * 40)) / (_columns - 1);
+        CGFloat xDistance = 0;
+        if (_columns > 1) {
+            xDistance = floorf(((self.bounds.size.width-lineWidth) - (_columns * 40)) / (_columns - 1));
+        }
+        CGFloat yDistance = 0;
+        if (_rows > 1) {
+            yDistance = floorf(((self.bounds.size.height-lineWidth) - (_rows * 40)) / (_rows - 1));
+        }
         NSMutableArray *array = [NSMutableArray arrayWithCapacity:_rows * _columns];
         for (NSInteger r = 0; r < _rows; r++) {
             for (NSInteger c = 0; c < _columns; c++) {
                 CAShapeLayer *swatch = [CAShapeLayer layer];
-                swatch.frame = CGRectMake(c * (40 + distance) + (lineWidth/2), r * (40 + distance), 40, 40);
+                swatch.frame = CGRectMake(c * (40 + xDistance) + (lineWidth/2), r * (40 + yDistance), 40, 40);
                 swatch.path = CGPathCreateWithRect(CGRectMake(0, 0, 40, 40), 0);
                 swatch.lineWidth = lineWidth;
                 swatch.strokeColor = [UIColor whiteColor].CGColor;
