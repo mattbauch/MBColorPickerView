@@ -10,6 +10,7 @@
 #import "MBHueSaturationPicker.h"
 #import "MBBrightnessPicker.h"
 #import "MBColorSwatchList.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface MBColorPicker () <MBSwatchListDelegate>
 
@@ -22,25 +23,48 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = [UIColor blackColor];
-        CGFloat hsPickerInset = 6.0f;
-        
-        CGFloat width = frame.size.width - hsPickerInset - hsPickerInset;
-        CGFloat brightnessPickerWidth = 50.0f;
-        CGFloat hsPickerWidth = MIN(width - 8 - brightnessPickerWidth, frame.size.height-(2*hsPickerInset));
-        
-        _hsPicker = [[MBHueSaturationPicker alloc] initWithFrame:CGRectMake(hsPickerInset, hsPickerInset, hsPickerWidth, hsPickerWidth)];
+    }
+    return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    CGFloat hsPickerInset = 6.0f;
+    
+    CGFloat width = self.bounds.size.width - hsPickerInset - hsPickerInset;
+    CGFloat brightnessPickerWidth = 50.0f;
+    CGFloat hsPickerWidth = MIN(width - 8 - brightnessPickerWidth, self.bounds.size.height-(2*hsPickerInset));
+    
+    CGRect hsPickerFrame = CGRectMake(hsPickerInset, hsPickerInset, hsPickerWidth, hsPickerWidth);
+    if (!_hsPicker) {
+        _hsPicker = [[MBHueSaturationPicker alloc] initWithFrame:hsPickerFrame];
         [_hsPicker addTarget:self action:@selector(hsPickerDidChangeValue:) forControlEvents:UIControlEventValueChanged];
         [self addSubview:_hsPicker];
-        
-        _brightnessPicker = [[MBBrightnessPicker alloc] initWithFrame:CGRectMake(hsPickerInset+hsPickerWidth+8, hsPickerInset, brightnessPickerWidth, hsPickerWidth)];
+    }
+    else {
+        _hsPicker.frame = hsPickerFrame;
+    }
+
+    CGRect brightnessPickerFrame = CGRectMake(hsPickerInset+hsPickerWidth+8, hsPickerInset, brightnessPickerWidth, hsPickerWidth);
+    if (!_brightnessPicker) {
+        _brightnessPicker = [[MBBrightnessPicker alloc] initWithFrame:brightnessPickerFrame];
         [_brightnessPicker addTarget:self action:@selector(brightnessPickerDidChangeValue:) forControlEvents:UIControlEventValueChanged];
         [self addSubview:_brightnessPicker];
-        
-        _swatchList = [[MBColorSwatchList alloc] initWithFrame:CGRectMake(hsPickerInset, hsPickerInset + hsPickerWidth + 8, width, 40)];
+    }
+    else {
+        _brightnessPicker.frame = brightnessPickerFrame;
+    }
+    CGRect swatchListFrame = CGRectMake(hsPickerInset, hsPickerInset + hsPickerWidth + 8, width, self.bounds.size.height - (hsPickerInset + hsPickerWidth + 8 + hsPickerInset));
+    if (!_swatchList) {
+        _swatchList = [[MBColorSwatchList alloc] initWithFrame:swatchListFrame];
         _swatchList.delegate = self;
         [self addSubview:_swatchList];
     }
-    return self;
+    else {
+        _swatchList.frame = swatchListFrame;
+    }
+    
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
