@@ -23,7 +23,7 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        CGFloat lineWidth = 1.f;
+        CGFloat lineWidth = 2.f;
         
         CGFloat borderInset = 0;
         
