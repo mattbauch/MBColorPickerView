@@ -18,6 +18,7 @@ Version History
 ===============
 
 0.1.0 Initial release
+0.2.0 Create Hue-Saturation-Image on first use and cache it. 
 
 
 TODO
