@@ -19,5 +19,6 @@
 - (void)setHue:(CGFloat)hue animated:(BOOL)animated;
 - (void)setSaturation:(CGFloat)saturation animated:(BOOL)animated;
 - (void)setBrightness:(CGFloat)brightness animated:(BOOL)animated;
+- (void)saveBackgroundImageForSize:(CGSize)size;
 
 @end

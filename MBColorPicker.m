@@ -10,6 +10,7 @@
 #import "MBHueSaturationPicker.h"
 #import "MBBrightnessPicker.h"
 #import "MBColorSwatchList.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface MBColorPicker () <MBSwatchListDelegate>
 
@@ -22,25 +23,40 @@
     self = [super initWithFrame:frame];
     if (self) {
         self.backgroundColor = [UIColor blackColor];
-        CGFloat hsPickerInset = 6.0f;
         
-        CGFloat width = frame.size.width - hsPickerInset - hsPickerInset;
-        CGFloat brightnessPickerWidth = 50.0f;
-        CGFloat hsPickerWidth = MIN(width - 8 - brightnessPickerWidth, frame.size.height-(2*hsPickerInset));
-        
-        _hsPicker = [[MBHueSaturationPicker alloc] initWithFrame:CGRectMake(hsPickerInset, hsPickerInset, hsPickerWidth, hsPickerWidth)];
+        _hsPicker = [[MBHueSaturationPicker alloc] initWithFrame:CGRectZero];
         [_hsPicker addTarget:self action:@selector(hsPickerDidChangeValue:) forControlEvents:UIControlEventValueChanged];
         [self addSubview:_hsPicker];
-        
-        _brightnessPicker = [[MBBrightnessPicker alloc] initWithFrame:CGRectMake(hsPickerInset+hsPickerWidth+8, hsPickerInset, brightnessPickerWidth, hsPickerWidth)];
+
+        _brightnessPicker = [[MBBrightnessPicker alloc] initWithFrame:CGRectZero];
         [_brightnessPicker addTarget:self action:@selector(brightnessPickerDidChangeValue:) forControlEvents:UIControlEventValueChanged];
         [self addSubview:_brightnessPicker];
-        
-        _swatchList = [[MBColorSwatchList alloc] initWithFrame:CGRectMake(hsPickerInset, hsPickerInset + hsPickerWidth + 8, width, 40)];
+
+        _swatchList = [[MBColorSwatchList alloc] initWithFrame:CGRectZero];
         _swatchList.delegate = self;
         [self addSubview:_swatchList];
     }
     return self;
+}
+
+- (void)layoutSubviews {
+    [super layoutSubviews];
+
+    CGFloat hsPickerInset = 6.0f;
+    
+    CGFloat width = self.bounds.size.width - hsPickerInset - hsPickerInset;
+    CGFloat brightnessPickerWidth = 50.0f;
+    CGFloat hsPickerWidth = MIN(width - 8 - brightnessPickerWidth, self.bounds.size.height-(2*hsPickerInset));
+    
+    CGRect hsPickerFrame = CGRectMake(hsPickerInset, hsPickerInset, hsPickerWidth, hsPickerWidth);
+    _hsPicker.frame = hsPickerFrame;
+
+    CGRect brightnessPickerFrame = CGRectMake(hsPickerInset+hsPickerWidth+8, hsPickerInset, brightnessPickerWidth, hsPickerWidth);
+    _brightnessPicker.frame = brightnessPickerFrame;
+
+    CGRect swatchListFrame = CGRectMake(hsPickerInset, hsPickerInset + hsPickerWidth + 8, width, self.bounds.size.height - (hsPickerInset + hsPickerWidth + 8 + hsPickerInset));
+    _swatchList.frame = swatchListFrame;
+    
 }
 
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
@@ -81,15 +97,23 @@
 }
 
 - (void)setColor:(UIColor *)color animated:(BOOL)animated {
-    CGFloat h,s,b,w;
-    if ([color getHue:&h saturation:&s brightness:&b alpha:NULL]) {
-        [self setHue:h animated:animated];
-        [self setSaturation:s animated:animated];
-        [self setBrightness:b animated:animated];
+    if (color) {
+        CGFloat h,s,b,w;
+        if ([color getHue:&h saturation:&s brightness:&b alpha:NULL]) {
+            [self setHue:h animated:animated];
+            [self setSaturation:s animated:animated];
+            [self setBrightness:b animated:animated];
+        }
+        else if ([color getWhite:&w alpha:NULL]) {
+            [self setSaturation:0 animated:animated];
+            [self setBrightness:w animated:animated];
+        }
     }
-    else if ([color getWhite:&w alpha:NULL]) {
+    else {
+        // no color
+        [self setHue:0 animated:animated];
         [self setSaturation:0 animated:animated];
-        [self setBrightness:w animated:animated];
+        [self setBrightness:-1 animated:animated];
     }
     _color = color;
 }
@@ -110,6 +134,11 @@
 
     _hue = sender.hue;
     _saturation = sender.saturation;
+    if (_brightness < 0) {
+        _brightness = 1;
+        [_brightnessPicker setBrightness:_brightness animated:NO];
+        [sender setBrightness:_brightness animated:NO];
+    }
     [self changeColorAndSendValueChangedAction];
 }
 
