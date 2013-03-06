@@ -139,11 +139,9 @@
 
 - (void)saveBackgroundImageForSize:(CGSize)size {
     if ([[[NSFileManager alloc] init] fileExistsAtPath:[self pathForSize:size]]) {
-        NSLog(@"No Need to render image again");
         return;
     }
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSLog(@"Save background image for size %@", NSStringFromCGSize(size));
         UIGraphicsBeginImageContextWithOptions(size, NO, [UIScreen mainScreen].scale);
         CGContextRef context = UIGraphicsGetCurrentContext();
         [self drawBackgroundInContext:context withSize:size];
@@ -151,8 +149,6 @@
         NSData *pngImage = UIImagePNGRepresentation(backgroundImage);
         [pngImage writeToFile:[self pathForSize:size] atomically:YES];
         UIGraphicsEndImageContext();
-        NSLog(@"Done");
-        
     });
 }
 
@@ -209,11 +205,9 @@
 
     UIImage *image = [UIImage imageWithContentsOfFile:[self pathForSize:self.bounds.size]];
     if (image) {
-        NSLog(@"Use Image %@", [self pathForSize:self.bounds.size]);
         [image drawInRect:self.bounds];
     }
     else {
-        NSLog(@"No Image %@", [self pathForSize:self.bounds.size]);
         [self drawBackgroundInContext:context withSize:self.bounds.size];
     }
 }
