@@ -111,6 +111,13 @@
     UIColor *color = [UIColor colorWithHue:_hue saturation:_saturation brightness:1 alpha:1];
     _gradientLayer.colors = @[(__bridge id)color.CGColor, (__bridge id)[UIColor blackColor].CGColor];
     
+    if (_brightness < 0) {
+        _crossHairLayer.hidden = YES;
+    }
+    else {
+        _crossHairLayer.hidden = NO;
+    }
+    
     [CATransaction commit];
 }
 
@@ -129,8 +136,8 @@
     CGFloat brightness = 1 - (y / self.bounds.size.height);
     if (brightness >= 0 && brightness <= 1) {
         _brightness = brightness;
-        [self configureLayers:NO];
         [self sendActionsForControlEvents:UIControlEventValueChanged];
+        [self configureLayers:NO];
     }
 }
 

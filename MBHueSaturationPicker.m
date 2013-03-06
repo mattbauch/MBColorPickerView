@@ -84,6 +84,13 @@
     _crossHairLayer.position = CGPointMake(point.x, point.y);
     _crossHairLayer.fillColor = [UIColor colorWithHue:_hue saturation:_saturation brightness:_brightness alpha:1].CGColor;
     
+    if (_brightness < 0) {
+        _crossHairLayer.hidden = YES;
+    }
+    else {
+        _crossHairLayer.hidden = NO;
+    }
+    
     [CATransaction commit];
 }
 
@@ -118,10 +125,9 @@
         angleDeg += 360.f;
     }
     _hue = angleDeg / 360.0f;
+    [self sendActionsForControlEvents:UIControlEventValueChanged];
 
     [self configureCrossHairLayerAnimated:NO];
-
-    [self sendActionsForControlEvents:UIControlEventValueChanged];
 }
 
 - (NSString *)pathForSize:(CGSize)size {

@@ -97,15 +97,23 @@
 }
 
 - (void)setColor:(UIColor *)color animated:(BOOL)animated {
-    CGFloat h,s,b,w;
-    if ([color getHue:&h saturation:&s brightness:&b alpha:NULL]) {
-        [self setHue:h animated:animated];
-        [self setSaturation:s animated:animated];
-        [self setBrightness:b animated:animated];
+    if (color) {
+        CGFloat h,s,b,w;
+        if ([color getHue:&h saturation:&s brightness:&b alpha:NULL]) {
+            [self setHue:h animated:animated];
+            [self setSaturation:s animated:animated];
+            [self setBrightness:b animated:animated];
+        }
+        else if ([color getWhite:&w alpha:NULL]) {
+            [self setSaturation:0 animated:animated];
+            [self setBrightness:w animated:animated];
+        }
     }
-    else if ([color getWhite:&w alpha:NULL]) {
+    else {
+        // no color
+        [self setHue:0 animated:animated];
         [self setSaturation:0 animated:animated];
-        [self setBrightness:w animated:animated];
+        [self setBrightness:-1 animated:animated];
     }
     _color = color;
 }
@@ -126,6 +134,11 @@
 
     _hue = sender.hue;
     _saturation = sender.saturation;
+    if (_brightness < 0) {
+        _brightness = 1;
+        [_brightnessPicker setBrightness:_brightness animated:NO];
+        [sender setBrightness:_brightness animated:NO];
+    }
     [self changeColorAndSendValueChangedAction];
 }
 
