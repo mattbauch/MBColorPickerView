@@ -132,8 +132,19 @@
 
 - (NSString *)pathForSize:(CGSize)size {
     CGFloat scale = [UIScreen mainScreen].scale;
+    NSString *filename = nil;
+    if ((int)scale == 2) {
+        filename = [NSString stringWithFormat:@"MBColorPickerImage-%d-%d@2x", (int)size.width, (int)size.height];
+    }
+    else {
+        filename = [NSString stringWithFormat:@"MBColorPickerImage-%d-%d", (int)size.width, (int)size.height];
+    }
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"png"];
+    if (bundlePath) {
+        return bundlePath;
+    }
+    filename = [filename stringByAppendingPathExtension:@"png"];
     NSString *cacheDirectory = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *filename = [NSString stringWithFormat:@"MBColorPickerImage-%d-%d__@%dx.png", (int)size.width, (int)size.height, (int)scale];
     return [cacheDirectory stringByAppendingPathComponent:filename];
 }
 
