@@ -146,7 +146,9 @@ static NSString * MBUDColorPickerSavedColors = @"MBColorPickerSavedColors";
             for (NSInteger c = 0; c < _columns; c++) {
                 CAShapeLayer *swatch = [CAShapeLayer layer];
                 swatch.frame = CGRectMake(c * (40 + xDistance) + (lineWidth/2), r * (40 + yDistance), 40, 40);
-                swatch.path = CGPathCreateWithRect(CGRectMake(0, 0, 40, 40), 0);
+                CGPathRef path = CGPathCreateWithRect(CGRectMake(0, 0, 40, 40), 0);
+                swatch.path = path;
+                CGPathRelease(path);
                 swatch.lineWidth = lineWidth;
                 swatch.strokeColor = [UIColor whiteColor].CGColor;
                 [self.layer addSublayer:swatch];

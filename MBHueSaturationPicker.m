@@ -44,11 +44,15 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     _borderLayer.frame = self.bounds;
-    _borderLayer.path = CGPathCreateWithEllipseInRect(self.bounds, 0);
+    CGPathRef borderPath = CGPathCreateWithEllipseInRect(self.bounds, 0);
+    _borderLayer.path = borderPath;
+    CGPathRelease(borderPath);
 
     CGFloat crossHairSize = 10;
     _crossHairLayer.frame = CGRectMake(40, 40, crossHairSize, crossHairSize);
-    _crossHairLayer.path = CGPathCreateWithEllipseInRect(CGRectMake(0, 0, crossHairSize, crossHairSize), 0);
+    CGPathRef crossHairPath = CGPathCreateWithEllipseInRect(CGRectMake(0, 0, crossHairSize, crossHairSize), 0);
+    _crossHairLayer.path = crossHairPath;
+    CGPathRelease(crossHairPath);
     
     [self configureCrossHairLayerAnimated:NO];
 }
@@ -132,8 +136,19 @@
 
 - (NSString *)pathForSize:(CGSize)size {
     CGFloat scale = [UIScreen mainScreen].scale;
+    NSString *filename = nil;
+    if ((int)scale == 2) {
+        filename = [NSString stringWithFormat:@"MBColorPickerImage-%d-%d@2x", (int)size.width, (int)size.height];
+    }
+    else {
+        filename = [NSString stringWithFormat:@"MBColorPickerImage-%d-%d", (int)size.width, (int)size.height];
+    }
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:filename ofType:@"png"];
+    if (bundlePath) {
+        return bundlePath;
+    }
+    filename = [filename stringByAppendingPathExtension:@"png"];
     NSString *cacheDirectory = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *filename = [NSString stringWithFormat:@"MBColorPickerImage-%d-%d__@%dx.png", (int)size.width, (int)size.height, (int)scale];
     return [cacheDirectory stringByAppendingPathComponent:filename];
 }
 
@@ -183,14 +198,17 @@
         
         CGContextSaveGState(context);
         CGContextAddPath(context, path);
+        
+        CGPathRelease(path);
         CGContextClip(context);
         
         NSArray *colors = @[(__bridge id)[UIColor colorWithWhite:1 alpha:1].CGColor, (__bridge id)color.CGColor];
         CGGradientRef gradient = CGGradientCreateWithColors(rgbColorSpace, (__bridge CFArrayRef)colors, NULL);
         CGContextDrawLinearGradient(context, gradient, start, end, kCGGradientDrawsBeforeStartLocation|kCGGradientDrawsAfterEndLocation);
-        
+        CGGradientRelease(gradient);
         CGContextRestoreGState(context);
     }
+    CGColorSpaceRelease(rgbColorSpace);
     
     CGContextRestoreGState(context);
     
