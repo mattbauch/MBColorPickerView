@@ -56,7 +56,9 @@
     _gradientLayer.colors = @[(__bridge id)[UIColor whiteColor].CGColor, (__bridge id)[UIColor blackColor].CGColor];
 
     _borderLayer.frame = CGRectInset(self.bounds, borderInset, borderInset);
-    _borderLayer.path = CGPathCreateWithRect(CGRectMake(0, 0, self.bounds.size.width-(2*borderInset), self.bounds.size.height-(2*borderInset)), 0);
+    CGPathRef borderLinePath = CGPathCreateWithRect(CGRectMake(0, 0, self.bounds.size.width-(2*borderInset), self.bounds.size.height-(2*borderInset)), 0);
+    _borderLayer.path = borderLinePath;
+    CGPathRelease(borderLinePath);
 
     CGFloat crossHairSize = 6;
     CGMutablePathRef path = CGPathCreateMutable();
@@ -65,7 +67,8 @@
     CGPathMoveToPoint(path, 0, 0, crossHairSize);
     CGPathAddLineToPoint(path, 0, self.bounds.size.width, crossHairSize);
     _crossHairLayer.path = path;
-
+    CGPathRelease(path);
+    
     _crossHairLayer.frame = CGRectMake(0, 0, self.bounds.size.width, crossHairSize);
 
     [_crossHairLayer.sublayers[0] removeFromSuperlayer];

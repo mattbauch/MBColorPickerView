@@ -44,11 +44,15 @@
 - (void)layoutSubviews {
     [super layoutSubviews];
     _borderLayer.frame = self.bounds;
-    _borderLayer.path = CGPathCreateWithEllipseInRect(self.bounds, 0);
+    CGPathRef borderPath = CGPathCreateWithEllipseInRect(self.bounds, 0);
+    _borderLayer.path = borderPath;
+    CGPathRelease(borderPath);
 
     CGFloat crossHairSize = 10;
     _crossHairLayer.frame = CGRectMake(40, 40, crossHairSize, crossHairSize);
-    _crossHairLayer.path = CGPathCreateWithEllipseInRect(CGRectMake(0, 0, crossHairSize, crossHairSize), 0);
+    CGPathRef crossHairPath = CGPathCreateWithEllipseInRect(CGRectMake(0, 0, crossHairSize, crossHairSize), 0);
+    _crossHairLayer.path = crossHairPath;
+    CGPathRelease(crossHairPath);
     
     [self configureCrossHairLayerAnimated:NO];
 }
@@ -194,14 +198,17 @@
         
         CGContextSaveGState(context);
         CGContextAddPath(context, path);
+        
+        CGPathRelease(path);
         CGContextClip(context);
         
         NSArray *colors = @[(__bridge id)[UIColor colorWithWhite:1 alpha:1].CGColor, (__bridge id)color.CGColor];
         CGGradientRef gradient = CGGradientCreateWithColors(rgbColorSpace, (__bridge CFArrayRef)colors, NULL);
         CGContextDrawLinearGradient(context, gradient, start, end, kCGGradientDrawsBeforeStartLocation|kCGGradientDrawsAfterEndLocation);
-        
+        CGGradientRelease(gradient);
         CGContextRestoreGState(context);
     }
+    CGColorSpaceRelease(rgbColorSpace);
     
     CGContextRestoreGState(context);
     
