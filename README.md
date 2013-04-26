@@ -17,8 +17,9 @@ See [Demo project](https://github.com/mattbauch/MBColorPickerViewDemo) to see ho
 Version History
 ===============
 
-0.1.0 Initial release
-0.2.0 Create Hue-Saturation-Image on first use and cache it. 
+0.1.0 Initial release  
+0.2.0 Create Hue-Saturation-Image on first use and cache it.  
+0.2.1 Bug fixes (mostly memory leaks) and hue picker image caching (takes really long to generate on devices)
 
 
 TODO
