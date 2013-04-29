@@ -30,6 +30,10 @@ static NSString * MBUDColorPickerSavedColors = @"MBColorPickerSavedColors";
                 _colors = colors;
             }
         }
+        if (!_colors) {
+            _colors = [NSArray array];
+        }
+        
         [self fillColorsArrayIfNecessary];
         
         _tapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapGesture:)];
@@ -70,7 +74,7 @@ static NSString * MBUDColorPickerSavedColors = @"MBColorPickerSavedColors";
         NSInteger difference = (_rows * _columns) - [_colors count];
         NSMutableArray *arr = [NSMutableArray arrayWithCapacity:difference];
         for (NSInteger i = 0; i < difference; i++) {
-            [arr addObject:[UIColor whiteColor]];
+            [arr addObject:[UIColor colorWithHue:i/(float)difference saturation:0.5f brightness:0.9f alpha:1]];
         }
         if (_colors) {
             _colors = [_colors arrayByAddingObjectsFromArray:arr];
@@ -125,10 +129,10 @@ static NSString * MBUDColorPickerSavedColors = @"MBColorPickerSavedColors";
 
 - (void)layoutSubviews {
     if (_columns <= 0) {
-        _columns = floorf(self.bounds.size.width/44.0f);
+        self.columns = floorf(self.bounds.size.width/44.0f);
     }
     if (_rows <= 0) {
-        _rows = floorf(self.bounds.size.height/44.0f);
+        self.rows = floorf(self.bounds.size.height/44.0f);
     }
 
     if (!_layers) {
